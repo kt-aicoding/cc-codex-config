@@ -7,7 +7,7 @@
 ## 功能
 
 - Claude Code：安装 `statusLine` 命令，从 stdin 接收会话 JSON，并按 `模型 | effort | context % | 5h % | 7d % | 费用` 渲染。
-- Codex CLI：安装推荐的 `[tui]` 状态栏配置，使用 Codex 内置项展示模型/effort、context、5 小时限额和周限额。
+- Codex CLI：安装推荐的 `[tui]` 状态栏配置，使用 Codex 内置项展示模型/effort、context、5 小时限额、周限额和当前 Git 分支。
 - Doctor：输出当前识别到的 Claude/Codex 配置路径和状态栏命令路径。
 
 ## 安装
@@ -80,13 +80,14 @@ status_line = [
   "context-used",
   "five-hour-limit",
   "weekly-limit",
+  "git-branch",
 ]
 status_line_use_colors = true
 ```
 
 如果 `[tui]` 已存在，只会替换 `status_line` 和 `status_line_use_colors`，保留该 section 内其他配置。
 
-当前 Codex CLI 的状态栏使用内置 TUI 项，可以覆盖模型/effort、context、5 小时限额和周限额；费用项目前不通过本项目自定义渲染。
+当前 Codex CLI 的状态栏使用内置 TUI 项，可以覆盖模型/effort、context、5 小时限额、周限额和当前 Git 分支；费用项目前不通过本项目自定义渲染。
 
 ## 开发
 

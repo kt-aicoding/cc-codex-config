@@ -15,6 +15,7 @@ CODEX_STATUS_LINE = """status_line = [
   "context-used",
   "five-hour-limit",
   "weekly-limit",
+  "git-branch",
 ]
 status_line_use_colors = true"""
 

@@ -60,6 +60,7 @@ class CodexConfigTests(unittest.TestCase):
         self.assertIn('"context-used"', result)
         self.assertIn('"five-hour-limit"', result)
         self.assertIn('"weekly-limit"', result)
+        self.assertIn('"git-branch"', result)
         self.assertIn("status_line_use_colors = true", result)
 
     def test_replaces_status_line_and_preserves_other_tui_keys(self):

@@ -7,7 +7,7 @@ This repository contains the first `kt-aicoding` CLI component: a small, depende
 ## What It Does
 
 - Claude Code: installs a `statusLine` command that renders `model | effort | context % | 5h % | 7d % | cost` when those fields are present in the status input.
-- Codex CLI: installs a recommended `[tui]` status line configuration using Codex's built-in model/effort, context, 5-hour limit, and weekly limit items.
+- Codex CLI: installs a recommended `[tui]` status line configuration using Codex's built-in model/effort, context, 5-hour limit, weekly limit, and git branch items.
 - Doctor: prints the detected local config paths and command path.
 
 ## Install
@@ -80,13 +80,14 @@ status_line = [
   "context-used",
   "five-hour-limit",
   "weekly-limit",
+  "git-branch",
 ]
 status_line_use_colors = true
 ```
 
 If `[tui]` already exists, only `status_line` and `status_line_use_colors` are replaced. Other keys in the section are preserved.
 
-Codex CLI currently exposes model/effort, context, 5-hour usage, and weekly usage as built-in status line items. This kit does not add a custom Codex cost renderer because Codex status lines are configured from built-in TUI items.
+Codex CLI currently exposes model/effort, context, 5-hour usage, weekly usage, and git branch as built-in status line items. This kit does not add a custom Codex cost renderer because Codex status lines are configured from built-in TUI items.
 
 ## Development
 
