@@ -477,3 +477,29 @@ def print_doctor() -> None:
     print(f"Claude settings: {claude} ({'exists' if claude.exists() else 'missing'})")
     print(f"Codex config:    {codex} ({'exists' if codex.exists() else 'missing'})")
     print(f"Command:         {default_command('claude')}")
+    print(f"Terminal:        {terminal_summary()}")
+    if is_warp_terminal():
+        print("Warp note:       NO_COLOR is ignored by the Claude statusLine renderer.")
+        print("                 Set KT_STATUSLINE_NO_COLOR=1 only if you want plain text.")
+
+
+def terminal_summary() -> str:
+    term_program = os.environ.get("TERM_PROGRAM", "")
+    term = os.environ.get("TERM", "")
+    warp_version = os.environ.get("WARP_CLIENT_VERSION") or os.environ.get("TERM_PROGRAM_VERSION")
+    parts = []
+    if term_program:
+        parts.append(term_program)
+    if term:
+        parts.append(f"TERM={term}")
+    if warp_version:
+        parts.append(warp_version)
+    return ", ".join(parts) if parts else "unknown"
+
+
+def is_warp_terminal() -> bool:
+    return (
+        os.environ.get("TERM_PROGRAM") == "WarpTerminal"
+        or os.environ.get("__CFBundleIdentifier", "").startswith("dev.warp.")
+        or any(key.startswith("WARP_") for key in os.environ)
+    )

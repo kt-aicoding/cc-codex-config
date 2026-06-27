@@ -284,8 +284,19 @@ def main() -> int:
     print(f"Codex CLI:    {codex_config}")
     if codex_backup:
         print(f"Codex backup: {codex_backup}")
+    if is_warp_terminal():
+        print("Warp detected: Claude statusLine colors stay enabled even when Warp exports NO_COLOR=1.")
+        print("Set KT_STATUSLINE_NO_COLOR=1 only if you want plain text.")
     print("Restart Claude Code/Codex to load the new config.")
     return 0
+
+
+def is_warp_terminal() -> bool:
+    return (
+        os.environ.get("TERM_PROGRAM") == "WarpTerminal"
+        or os.environ.get("__CFBundleIdentifier", "").startswith("dev.warp.")
+        or any(key.startswith("WARP_") for key in os.environ)
+    )
 
 
 def write_statusline_command(path: Path) -> None:

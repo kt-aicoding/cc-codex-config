@@ -16,6 +16,13 @@ python3 -c "$(curl -fsSL https://raw.githubusercontent.com/kt-aicoding/cc-codex-
 
 ## 当前会配置什么
 
+### Warp 终端
+
+- 自动检测 Warp 环境：`TERM_PROGRAM=WarpTerminal` 或 `WARP_*` 环境变量。
+- Claude Code 状态栏颜色不会被 Warp 默认导出的 `NO_COLOR=1` 关闭。
+- 如需关闭本工具颜色，只设置 `KT_STATUSLINE_NO_COLOR=1`。
+- 额外说明见 [configs/warp/README.md](configs/warp/README.md)。
+
 ### Claude Code
 
 - 安装本地状态栏命令：`~/.kt-aicoding/cc-codex-config/kt-statusline`
@@ -79,6 +86,7 @@ KT_STATUSLINE_NO_COLOR=1
 configs/                         可公开审计的配置片段
 configs/claude/                  Claude Code 配置片段
 configs/codex/                   Codex CLI 配置片段
+configs/warp/                    Warp 终端使用建议
 scripts/install.py               一句话安装脚本
 skills/ai-coding-config/         可复制的 Codex Skill
 src/statusline_kit/              Claude Code 状态栏渲染器和本地 CLI
@@ -115,6 +123,12 @@ python3 scripts/install.py
 
 ```bash
 python3 -m unittest
+```
+
+检查当前终端和配置路径：
+
+```bash
+./bin/kt-aicoding-config doctor
 ```
 
 ## 链接

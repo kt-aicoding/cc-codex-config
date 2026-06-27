@@ -17,6 +17,7 @@ This installs:
 
 - Claude Code `statusLine` command at `~/.kt-aicoding/cc-codex-config/kt-statusline`
 - Codex CLI safe preferences and `[tui].status_line` in `~/.codex/config.toml`
+- Warp-aware behavior for Claude Code statusLine colors when Warp exports `NO_COLOR=1`
 
 The target display is:
 
@@ -25,6 +26,8 @@ The target display is:
 ```
 
 Claude Code uses ANSI color warnings: context used turns yellow at 60% and red at 80%; 5h/weekly remaining turns yellow at 40% and red at 20%. Set `KT_STATUSLINE_NO_COLOR=1` to disable color.
+
+When the user mainly works in Warp, mention that Warp is detected via `TERM_PROGRAM=WarpTerminal` or `WARP_*` environment variables. The renderer intentionally ignores generic `NO_COLOR` so risk colors remain visible in Warp.
 
 After installation, tell the user to restart Claude Code and Codex so both tools reload their config.
 

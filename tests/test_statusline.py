@@ -2,11 +2,20 @@ import unittest
 from pathlib import Path
 import sys
 import tempfile
+from unittest.mock import patch
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from statusline_kit.cli import format_claude_status, main, upsert_codex_config, upsert_tui_status_line
+from statusline_kit.cli import (
+    format_claude_status,
+    is_warp_terminal,
+    main,
+    should_use_color,
+    terminal_summary,
+    upsert_codex_config,
+    upsert_tui_status_line,
+)
 
 
 class ClaudeStatusTests(unittest.TestCase):
@@ -163,6 +172,21 @@ class CliDispatchTests(unittest.TestCase):
 
             self.assertEqual(0, code)
             self.assertIn("custom-statusline claude", settings.read_text())
+
+
+class WarpEnvironmentTests(unittest.TestCase):
+    def test_detects_warp_terminal(self):
+        with patch.dict("os.environ", {"TERM_PROGRAM": "WarpTerminal", "WARP_CLIENT_VERSION": "v1"}, clear=True):
+            self.assertTrue(is_warp_terminal())
+            self.assertIn("WarpTerminal", terminal_summary())
+
+    def test_no_color_does_not_disable_statusline_colors_in_warp(self):
+        with patch.dict("os.environ", {"NO_COLOR": "1", "TERM_PROGRAM": "WarpTerminal"}, clear=True):
+            self.assertTrue(should_use_color())
+
+    def test_tool_specific_color_disable_still_works(self):
+        with patch.dict("os.environ", {"KT_STATUSLINE_NO_COLOR": "1", "TERM_PROGRAM": "WarpTerminal"}, clear=True):
+            self.assertFalse(should_use_color())
 
 
 if __name__ == "__main__":
