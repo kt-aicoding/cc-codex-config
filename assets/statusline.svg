@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="260" viewBox="0 0 1180 260" role="img" aria-labelledby="title desc">
+  <title id="title">Status line thresholds</title>
+  <desc id="desc">Status line display with context and rate limit warning thresholds.</desc>
+  <rect width="1180" height="260" rx="18" fill="#0f1724"/>
+  <rect x="32" y="34" width="1116" height="74" rx="14" fill="#111c2d" stroke="#334155"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="22">
+    <text x="58" y="80" fill="#e5e7eb">gpt-5.5 xhigh</text>
+    <text x="262" y="80" fill="#64748b">·</text>
+    <text x="292" y="80" fill="#86efac">Context 25% used</text>
+    <text x="522" y="80" fill="#64748b">·</text>
+    <text x="552" y="80" fill="#fbbf24">5h 38% left</text>
+    <text x="732" y="80" fill="#64748b">·</text>
+    <text x="762" y="80" fill="#fca5a5">weekly 18% left</text>
+    <text x="990" y="80" fill="#64748b">·</text>
+    <text x="1020" y="80" fill="#67e8f9">main</text>
+  </g>
+
+  <g font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18">
+    <text x="56" y="154" fill="#cbd5e1" font-weight="700">Warning rules</text>
+    <text x="56" y="192" fill="#86efac">Green</text>
+    <text x="126" y="192" fill="#94a3b8">Context &lt; 60%, limits &gt; 40% left</text>
+    <text x="480" y="192" fill="#fbbf24">Yellow</text>
+    <text x="565" y="192" fill="#94a3b8">Context 60-79%, limits 21-40% left</text>
+    <text x="900" y="192" fill="#fca5a5">Red</text>
+    <text x="955" y="192" fill="#94a3b8">Context >= 80%, limits &lt;= 20% left</text>
+  </g>
+</svg>

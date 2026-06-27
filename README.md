@@ -1,5 +1,7 @@
 # cc-codex-config
 
+![cc-codex-config banner](assets/banner.svg)
+
 我的 Claude Code（cc）和 Codex CLI 配置仓库，面向 Warp 终端使用场景维护。
 
 这里统一保存可公开的 AI Coding 配置：状态栏、Codex 偏好、Warp 注意事项、操作资料、Codex Skill、profile 模板和一键安装脚本。状态栏只是第一个模块，后续 cc / Codex 相关的安全配置和个人偏好都放在这里维护。
@@ -57,6 +59,8 @@ python3 -c "$(curl -fsSL https://raw.githubusercontent.com/kt-aicoding/cc-codex-
   - context7 / playwright MCP servers
 
 ## 状态栏
+
+![status line warning rules](assets/statusline.svg)
 
 默认效果：
 
