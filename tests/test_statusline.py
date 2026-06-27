@@ -25,7 +25,7 @@ class ClaudeStatusTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            "Claude Sonnet | effort medium | context 37.5% | 5h 12% | 7d 64% | $0.0214",
+            "Claude Sonnet medium · Context 37.5% used · 5h 88% left · weekly 36% left",
             status,
         )
 
@@ -46,7 +46,7 @@ class ClaudeStatusTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            "Claude Sonnet | effort high | context 42% | 5h 25% | 7d 75%",
+            "Claude Sonnet high · Context 42% used · 5h 75% left · weekly 25% left",
             status,
         )
 

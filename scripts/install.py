@@ -1,97 +1,38 @@
+#!/usr/bin/env python3
 from __future__ import annotations
 
-import argparse
 import datetime as dt
 import json
 import os
 from pathlib import Path
 import shutil
+
+
+STATUSLINE_SCRIPT = r'''#!/usr/bin/env python3
+from __future__ import annotations
+
+import json
+from pathlib import Path
 import subprocess
 import sys
-from typing import Any, Iterable
+from typing import Any
 
 
-CODEX_STATUS_LINE = """status_line = [
-  "model-with-reasoning",
-  "context-used",
-  "five-hour-limit",
-  "weekly-limit",
-  "git-branch",
-]
-status_line_use_colors = true"""
-
-
-def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        prog="kt-statusline",
-        description="Status line kit for Claude Code and Codex CLI.",
-    )
-    subparsers = parser.add_subparsers(dest="command")
-
-    subparsers.add_parser("claude", help="Render one Claude Code status line from stdin JSON.")
-    subparsers.add_parser("doctor", help="Show detected Claude/Codex config paths.")
-
-    install_claude = subparsers.add_parser(
-        "install-claude",
-        help="Install this command as the Claude Code statusLine command.",
-    )
-    install_claude.add_argument("--settings", type=Path, default=default_claude_settings())
-    install_claude.add_argument("--command", dest="status_command", default=default_command("claude"))
-
-    install_codex = subparsers.add_parser(
-        "install-codex",
-        help="Install the recommended Codex CLI TUI status line config.",
-    )
-    install_codex.add_argument("--config", type=Path, default=default_codex_config())
-
-    args = parser.parse_args(argv)
-
-    if args.command == "claude":
-        return render_claude_command()
-    if args.command == "install-claude":
-        backup = install_claude_statusline(args.settings, args.status_command)
-        print(f"Installed Claude Code statusLine in {args.settings}")
-        if backup:
-            print(f"Backup: {backup}")
-        return 0
-    if args.command == "install-codex":
-        backup = install_codex_statusline(args.config)
-        print(f"Installed Codex CLI TUI status line in {args.config}")
-        if backup:
-            print(f"Backup: {backup}")
-        return 0
-    if args.command == "doctor":
-        print_doctor()
-        return 0
-
-    parser.print_help()
-    return 2
-
-
-def default_claude_settings() -> Path:
-    return Path(os.environ.get("CLAUDE_DIR", Path.home() / ".claude")) / "settings.json"
-
-
-def default_codex_config() -> Path:
-    return Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")) / "config.toml"
-
-
-def default_command(mode: str) -> str:
-    script = Path(__file__).resolve().parents[2] / "bin" / "kt-statusline"
-    return f"{script} {mode}"
-
-
-def render_claude_command() -> int:
+def main() -> int:
+    command = sys.argv[1] if len(sys.argv) > 1 else "claude"
+    if command != "claude":
+        print("usage: kt-statusline claude", file=sys.stderr)
+        return 2
     raw = sys.stdin.read().strip()
     try:
         payload = json.loads(raw) if raw else {}
     except json.JSONDecodeError:
         payload = {}
-    print(format_claude_status(payload))
+    print(format_status(payload))
     return 0
 
 
-def format_claude_status(payload: dict[str, Any]) -> str:
+def format_status(payload: dict[str, Any]) -> str:
     model = first_text(
         nested(payload, "model", "display_name"),
         nested(payload, "model", "name"),
@@ -121,9 +62,7 @@ def format_claude_status(payload: dict[str, Any]) -> str:
     )
     branch = git_branch(cwd)
 
-    headline = model
-    if effort:
-        headline = f"{headline} {effort}"
+    headline = model if not effort else f"{model} {effort}"
     parts = [headline]
     if context_used is not None:
         parts.append(f"Context {format_percent(context_used)} used")
@@ -133,7 +72,7 @@ def format_claude_status(payload: dict[str, Any]) -> str:
         parts.append(f"weekly {format_percent(weekly_left)} left")
     if branch:
         parts.append(branch)
-    return " · ".join(parts)
+    return (" " + chr(183) + " ").join(parts)
 
 
 def nested(data: dict[str, Any], *path: str) -> Any:
@@ -147,19 +86,15 @@ def nested(data: dict[str, Any], *path: str) -> Any:
 
 def rate_limit_left(payload: dict[str, Any], names: tuple[str, ...]) -> float | None:
     left = first_float(
-        rate_limit_mapping_value(
-            payload,
-            names,
-            ("remaining_percentage", "remaining_percent", "left_percentage", "left_percent"),
-        ),
-        rate_limit_value(payload, names, ("remaining_percentage", "remaining_percent", "left_percentage", "left_percent")),
+        rate_limit_mapping_value(payload, names, ("remaining_percentage", "remaining_percent", "left_percentage", "left_percent")),
+        rate_limit_list_value(payload, names, ("remaining_percentage", "remaining_percent", "left_percentage", "left_percent")),
     )
     if left is not None:
         return normalize_percent(left)
 
     used = first_float(
         rate_limit_mapping_value(payload, names, ("used_percentage", "used_percent")),
-        rate_limit_value(payload, names, ("used_percentage", "used_percent")),
+        rate_limit_list_value(payload, names, ("used_percentage", "used_percent")),
     )
     if used is None:
         return None
@@ -180,7 +115,7 @@ def rate_limit_mapping_value(payload: dict[str, Any], names: tuple[str, ...], ke
     return None
 
 
-def rate_limit_value(payload: dict[str, Any], names: tuple[str, ...], keys: tuple[str, ...]) -> Any:
+def rate_limit_list_value(payload: dict[str, Any], names: tuple[str, ...], keys: tuple[str, ...]) -> Any:
     rate_limits = payload.get("rate_limits")
     if not isinstance(rate_limits, list):
         return None
@@ -255,19 +190,62 @@ def git_branch(cwd: str) -> str:
     return branch
 
 
-def install_claude_statusline(settings_path: Path, command: str) -> Path | None:
+if __name__ == "__main__":
+    raise SystemExit(main())
+'''
+
+
+CODEX_STATUS_LINE = """status_line = [
+  "model-with-reasoning",
+  "context-used",
+  "five-hour-limit",
+  "weekly-limit",
+  "git-branch",
+]
+status_line_use_colors = true"""
+
+
+def main() -> int:
+    install_dir = Path(os.environ.get("KT_STATUSLINE_HOME", Path.home() / ".kt-aicoding" / "statusline-kit"))
+    command_path = install_dir / "kt-statusline"
+    write_statusline_command(command_path)
+
+    claude_settings = Path(os.environ.get("CLAUDE_DIR", Path.home() / ".claude")) / "settings.json"
+    codex_config = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")) / "config.toml"
+
+    claude_backup = install_claude(claude_settings, command_path)
+    codex_backup = install_codex(codex_config)
+
+    print("KT AI Coding statusline installed.")
+    print(f"Claude Code: {claude_settings}")
+    if claude_backup:
+        print(f"Claude backup: {claude_backup}")
+    print(f"Codex CLI:    {codex_config}")
+    if codex_backup:
+        print(f"Codex backup: {codex_backup}")
+    print("Restart Claude Code/Codex to load the new status line.")
+    return 0
+
+
+def write_statusline_command(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(STATUSLINE_SCRIPT)
+    path.chmod(0o755)
+
+
+def install_claude(settings_path: Path, command_path: Path) -> Path | None:
     settings = read_json_object(settings_path)
     backup = backup_file(settings_path)
     settings["statusLine"] = {
         "type": "command",
-        "command": command,
+        "command": f"{command_path} claude",
     }
     settings_path.parent.mkdir(parents=True, exist_ok=True)
     settings_path.write_text(json.dumps(settings, indent=2, ensure_ascii=False) + "\n")
     return backup
 
 
-def read_json_object(path: Path) -> dict[str, Any]:
+def read_json_object(path: Path) -> dict:
     if not path.exists():
         return {}
     try:
@@ -279,12 +257,11 @@ def read_json_object(path: Path) -> dict[str, Any]:
     return data
 
 
-def install_codex_statusline(config_path: Path) -> Path | None:
+def install_codex(config_path: Path) -> Path | None:
     text = config_path.read_text() if config_path.exists() else ""
     backup = backup_file(config_path)
-    updated = upsert_tui_status_line(text)
     config_path.parent.mkdir(parents=True, exist_ok=True)
-    config_path.write_text(updated)
+    config_path.write_text(upsert_tui_status_line(text))
     return backup
 
 
@@ -323,7 +300,7 @@ def find_table(lines: list[str], table_name: str) -> tuple[int | None, int]:
     return start, end
 
 
-def remove_tui_status_keys(lines: Iterable[str]) -> list[str]:
+def remove_tui_status_keys(lines: list[str]) -> list[str]:
     kept: list[str] = []
     skipping_array = False
     for line in lines:
@@ -355,9 +332,5 @@ def backup_file(path: Path) -> Path | None:
     return backup
 
 
-def print_doctor() -> None:
-    claude = default_claude_settings()
-    codex = default_codex_config()
-    print(f"Claude settings: {claude} ({'exists' if claude.exists() else 'missing'})")
-    print(f"Codex config:    {codex} ({'exists' if codex.exists() else 'missing'})")
-    print(f"Command:         {default_command('claude')}")
+if __name__ == "__main__":
+    raise SystemExit(main())

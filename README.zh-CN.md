@@ -1,77 +1,51 @@
 # statusline-kit
 
-面向 Claude Code 和 Codex CLI 的状态栏组件。
+Claude Code 和 Codex CLI 的统一状态栏配置。
 
-这是 `kt-aicoding` 的第一个实际项目：一个无第三方依赖的小型 CLI，用来把模型、effort、context 百分比、限额百分比和费用信息放到 AI Coding 工具的状态栏里。
+## 一句话配置
 
-## 功能
-
-- Claude Code：安装 `statusLine` 命令，从 stdin 接收会话 JSON，并按 `模型 | effort | context % | 5h % | 7d % | 费用` 渲染。
-- Codex CLI：安装推荐的 `[tui]` 状态栏配置，使用 Codex 内置项展示模型/effort、context、5 小时限额、周限额和当前 Git 分支。
-- Doctor：输出当前识别到的 Claude/Codex 配置路径和状态栏命令路径。
-
-## 安装
+复制下面这一行运行即可同时配置 Claude Code 和 Codex CLI：
 
 ```bash
-git clone https://github.com/kt-aicoding/statusline-kit.git
-cd statusline-kit
-chmod +x bin/kt-statusline
+python3 -c "$(curl -fsSL https://raw.githubusercontent.com/kt-aicoding/statusline-kit/main/scripts/install.py)"
 ```
 
-安装 Claude Code 状态栏：
+配置完成后，重启 Claude Code 和 Codex。
 
-```bash
-./bin/kt-statusline install-claude
-```
+## 状态栏样式
 
-安装 Codex CLI 状态栏：
-
-```bash
-./bin/kt-statusline install-codex
-```
-
-两个安装命令都会在写入前创建带时间戳的备份文件。
-
-## 命令
-
-```bash
-./bin/kt-statusline claude
-./bin/kt-statusline install-claude
-./bin/kt-statusline install-codex
-./bin/kt-statusline doctor
-```
-
-## 预览
-
-```bash
-printf '{"model":{"display_name":"Claude Sonnet"},"effort":{"level":"medium"},"context_window":{"used_percentage":37.5},"rate_limits":{"five_hour":{"used_percentage":12},"seven_day":{"used_percentage":64}},"cost":{"total_cost_usd":0.0214}}' \
-  | ./bin/kt-statusline claude
-```
-
-示例输出：
+目标效果：
 
 ```text
-Claude Sonnet | effort medium | context 37.5% | 5h 12% | 7d 64% | $0.0214
+gpt-5.5 high · Context 25% used · 5h 67% left · weekly 71% left · main
 ```
 
-## Claude Code 配置
+字段顺序：
 
-`install-claude` 会向 `~/.claude/settings.json` 写入类似配置：
+```text
+模型 effort · Context 已用百分比 · 5h 剩余百分比 · weekly 剩余百分比 · 当前 Git 分支
+```
+
+## 会改什么
+
+安装脚本会写入一个本地状态栏命令：
+
+```text
+~/.kt-aicoding/statusline-kit/kt-statusline
+```
+
+并更新 Claude Code 配置：
 
 ```json
 {
   "statusLine": {
     "type": "command",
-    "command": "/absolute/path/to/bin/kt-statusline claude"
+    "command": "~/.kt-aicoding/statusline-kit/kt-statusline claude"
   }
 }
 ```
 
-Claude Code 会把当前会话信息通过 stdin 传给这个命令。本项目的渲染逻辑会尽量兼容不同字段，缺失的字段不会显示。
-
-## Codex CLI 配置
-
-`install-codex` 会向 `~/.codex/config.toml` 写入：
+同时更新 Codex CLI 配置：
 
 ```toml
 [tui]
@@ -85,11 +59,25 @@ status_line = [
 status_line_use_colors = true
 ```
 
-如果 `[tui]` 已存在，只会替换 `status_line` 和 `status_line_use_colors`，保留该 section 内其他配置。
+写入前会自动生成带时间戳的备份文件。
 
-当前 Codex CLI 的状态栏使用内置 TUI 项，可以覆盖模型/effort、context、5 小时限额、周限额和当前 Git 分支；费用项目前不通过本项目自定义渲染。
+## Skill
 
-## 开发
+本仓库内置一个可复制的 Codex Skill：
+
+```text
+skills/ai-coding-statusline/SKILL.md
+```
+
+这个 Skill 的用途是让 Codex 在用户要求配置 Claude Code / Codex CLI 状态栏时，直接运行本仓库的一句话安装命令。
+
+## 本地开发
+
+克隆仓库后可以用本地脚本安装：
+
+```bash
+python3 scripts/install.py
+```
 
 运行测试：
 
@@ -97,7 +85,6 @@ status_line_use_colors = true
 python3 -m unittest
 ```
 
-## 参考
+## 链接
 
-- 英文 README：[README.md](README.md)
 - Claude Code status line 文档：https://code.claude.com/docs/en/statusline
