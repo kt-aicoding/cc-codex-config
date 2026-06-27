@@ -88,6 +88,7 @@ configs/claude/                  Claude Code 配置片段
 configs/codex/                   Codex CLI 配置片段
 configs/warp/                    Warp 终端使用建议
 configs/codex/profiles/          Codex profile 模板
+docs/operations/                 Warp / Claude Code / Codex CLI 快捷键和操作资料
 docs/related-projects.md         相关项目调研和取舍
 scripts/install.py               一句话安装脚本
 skills/ai-coding-config/         可复制的 Codex Skill
@@ -116,6 +117,12 @@ skills/ai-coding-config/SKILL.md
 ```
 
 这个 Skill 的用途是让 Codex 在用户要求配置 Claude Code / Codex CLI 偏好、状态栏或通用 AI Coding 环境时，直接运行本仓库的一句话安装命令。
+
+## 操作资料
+
+- [Warp 终端](docs/operations/warp.md)
+- [Claude Code](docs/operations/claude-code.md)
+- [Codex CLI](docs/operations/codex-cli.md)
 
 ## 安全边界
 

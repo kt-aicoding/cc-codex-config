@@ -67,3 +67,7 @@ Warp 会导出 `TERM_PROGRAM=WarpTerminal`、`WARP_*` 以及常见的 `NO_COLOR=
 - 把常用 prompt / profile 拆成更细的 `configs/codex/profiles/*.config.toml`。
 - 增加本地导入命令，把当前配置中的安全项同步回 `configs/`。
 - 如果 Codex 将来支持外部 status line command，再统一 cc / Codex 的渲染器。
+
+## 操作资料
+
+日常快捷键和操作资料放在 [operations/](operations/)。
