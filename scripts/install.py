@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import datetime as dt
 import json
 import os
@@ -355,14 +356,35 @@ ENV_SNIPPET = '''# kt-aicoding optional statusline controls.
 '''
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Install public Claude Code and Codex CLI configuration snippets.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print target paths and dependency checks without writing files.",
+    )
+    args = parser.parse_args(argv)
+
     install_dir = Path(os.environ.get("KT_AICODING_CONFIG_HOME", Path.home() / ".kt-aicoding" / "claudecode-codex-config"))
     command_path = install_dir / "kt-statusline"
-    write_statusline_command(command_path)
-    write_support_files(install_dir)
 
     claude_settings = Path(os.environ.get("CLAUDE_DIR", Path.home() / ".claude")) / "settings.json"
     codex_config = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")) / "config.toml"
+
+    if args.dry_run:
+        print("KT AI Coding config dry run.")
+        print(f"Would write local command: {command_path}")
+        print(f"Would write local notes:   {install_dir / 'README.txt'}")
+        print(f"Would update Claude Code:  {claude_settings}")
+        print(f"Would update Codex CLI:    {codex_config}")
+        print(f"Would write Codex profiles under: {codex_config.parent}")
+        print_dependency_report()
+        return 0
+
+    write_statusline_command(command_path)
+    write_support_files(install_dir)
 
     claude_backup = install_claude(claude_settings, command_path)
     codex_backup = install_codex(codex_config)

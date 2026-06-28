@@ -135,8 +135,9 @@ export KT_STATUSLINE_NO_COLOR=1
 ## 本地开发
 
 ```bash
-python3 scripts/install.py
 python3 -m unittest
+python3 scripts/install.py --dry-run
+tmp="$(mktemp -d)" && CLAUDE_DIR="$tmp/claude" CODEX_HOME="$tmp/codex" KT_AICODING_CONFIG_HOME="$tmp/local" python3 scripts/install.py
 ./bin/kt-aicoding-config doctor
 ```
 
